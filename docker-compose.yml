@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  interface_usuario:
+    # Builda a imagem usando o Dockerfile deste repositório Git
+    build: .
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      # Referência para ambiente
+      - ConnectionStrings__ConnectionString=${CONNECTION_STRING}
+    volumes:
+      # MAPEAMENTO FÍSICO DO SERVIDOR
+      - /app/site_abast/UI:/app
+    depends_on:
+      - db_postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: ["dotnet", "Abastecimento.Blazor.Server.dll"]
+
+  api_integracoes:
+    build: .
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__ConnectionString=${CONNECTION_STRING}
+    volumes:
+      # MAPEAMENTO FÍSICO DO SERVIDOR
+      - /app/site_abast/Integracoes:/app
+    depends_on:
+      - db_postgres
+    command: ["dotnet", "Abastecimento.WebApi.dll"]
+
+  db_postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=abastecimento
+    volumes:
+      - dados_abastecimento:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dados_abastecimento:
