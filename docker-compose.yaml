@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://*:80
       # Referência para ambiente
       - ConnectionStrings__ConnectionString=${CONNECTION_STRING}
     volumes:
@@ -27,7 +27,7 @@ services:
     restart: always
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://*:80
       - ConnectionStrings__ConnectionString=${CONNECTION_STRING}
     volumes:
       # MAPEAMENTO FÍSICO DO SERVIDOR
